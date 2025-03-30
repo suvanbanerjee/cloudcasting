@@ -69,7 +69,9 @@ const Header = () => {
             <button
               className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
               onClick={() => {
-                localStorage.setItem("isLoggedIn", "false");
+                if (typeof window !== 'undefined') {
+                  localStorage.setItem("isLoggedIn", "false");
+                }
                 router.push("/login");
               }}
             >

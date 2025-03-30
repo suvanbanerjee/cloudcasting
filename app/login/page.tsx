@@ -17,7 +17,9 @@ const Login = () => {
 
     if (username === sampleUsername && password === samplePassword) {
       setError("");
-      localStorage.setItem("isLoggedIn", "true");
+      if (typeof window !== 'undefined') {
+        localStorage.setItem("isLoggedIn", "true");
+      }
       router.push("/");
     } else {
       setError("Invalid username or password");
@@ -29,7 +31,7 @@ const Login = () => {
       <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
         <h1 className="text-3xl font-bold text-center mb-2">Welcome</h1>
         <p className="text-center text-gray-600 mb-6">
-          Login to continue to cloudcasting
+          Use username "admin" and password "password" to login.
         </p>
         <form onSubmit={handleLogin}>
           <div className="mb-4">
