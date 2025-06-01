@@ -10,10 +10,16 @@ export default function CallbackPage() {
   const searchParams = useSearchParams();
   
   useEffect(() => {
-    // If authentication is complete, redirect to the home page
-    if (!isLoading && isAuthenticated) {
-      const returnTo = searchParams.get('returnTo');
-      router.push(returnTo || '/');
+    // If authentication process is finished (no longer loading)
+    if (!isLoading) {
+      // Only redirect if authenticated
+      if (isAuthenticated) {
+        const returnTo = searchParams.get('returnTo');
+        router.push(returnTo || '/');
+      } else {
+        // If not authenticated after callback completes, go to login
+        router.push('/login');
+      }
     }
   }, [isAuthenticated, isLoading, router, searchParams]);
   

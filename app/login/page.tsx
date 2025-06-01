@@ -1,33 +1,27 @@
 "use client";
 
 import { useAuth } from "../../hooks/useAuth";
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 
 const Login = () => {
-  const { signIn, isAuthenticated } = useAuth();
+  const { signIn, isAuthenticated, isLoading } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const [authInitiated, setAuthInitiated] = useState(false);
 
   useEffect(() => {
-    // Redirect to home if already authenticated
-    if (isAuthenticated) {
-      router.push("/");
-    }
-  }, [isAuthenticated, router]);
+    if (!isLoading) {
+      if (isAuthenticated) {
+        router.push("/");
 
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    signIn();
-  };
-  useEffect(() => {
-    // Redirect to home if already authenticated
-    if (isAuthenticated) {
-      router.push("/");
-    } else {
-      // If not authenticated, redirect directly to Auth0 login
-      signIn();
+      } else if (!authInitiated) {
+        setAuthInitiated(true);
+        const returnTo = searchParams.get('returnTo') || '/';
+        signIn();
+      }
     }
-  }, [isAuthenticated, router, signIn]);
+  }, [isAuthenticated, isLoading, router, signIn, authInitiated]);
 
   return <></>;
 };
