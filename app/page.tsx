@@ -4,13 +4,9 @@ import { useRef, useEffect } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import Header from '@/components/navbar';
+import { withAuth } from '@/utils/withAuth';
 
 const HomePage = () => {
-  useEffect(() => {
-    if (localStorage.getItem("isLoggedIn") !== "true") {
-      window.location.href = "/login";
-    }
-  }, []);
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const mapContainerRef = useRef(null);
 
@@ -41,4 +37,4 @@ const HomePage = () => {
   );
 };
 
-export default HomePage;
+export default withAuth(HomePage);

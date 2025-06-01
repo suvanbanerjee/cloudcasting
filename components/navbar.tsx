@@ -1,10 +1,14 @@
+"use client";
+
 import { useState } from "react";
 import { User } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useAuth } from "../hooks/useAuth";
 
 const Header = () => {
   const router = useRouter();
   const [showPopup, setShowPopup] = useState(false);
+  const { user, isAuthenticated, signOut } = useAuth();
 
   const togglePopup = () => {
     setShowPopup(!showPopup);
@@ -20,7 +24,15 @@ const Header = () => {
           className="flex items-center justify-center w-8 h-8 rounded-full bg-gray-300 hover:bg-gray-400 transition"
           aria-label="User menu"
         >
-          <User size={20} />
+          {user?.image ? (
+            <img 
+              src={user.image} 
+              alt={user.name || "User"} 
+              className="w-8 h-8 rounded-full"
+            />
+          ) : (
+            <User size={20} />
+          )}
         </button>
 
         {showPopup && (
@@ -60,23 +72,37 @@ const Header = () => {
             <div className="px-4 py-2 text-xs text-gray-500">
               Version 0.0.1
             </div>
-            <div className="px-4 py-2 text-xs text-gray-500">
-              Signed in as <br />
-              <span className="font-medium">useremail@example.com</span>
-            </div>
+            {isAuthenticated ? (
+              <div className="px-4 py-2 text-xs text-gray-500">
+                Signed in as <br />
+                <span className="font-medium">{user?.email || user?.name}</span>
+              </div>
+            ) : (
+              <div className="px-4 py-2 text-xs text-gray-500">
+                Not signed in
+              </div>
+            )}
 
             <hr className="my-2 border-gray-200" />
-            <button
-              className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
-              onClick={() => {
-                if (typeof window !== 'undefined') {
-                  localStorage.setItem("isLoggedIn", "false");
-                }
-                router.push("/login");
-              }}
-            >
-              Sign out
-            </button>
+            {isAuthenticated ? (
+              <button
+                className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                onClick={() => {
+                  signOut();
+                }}
+              >
+                Sign out
+              </button>
+            ) : (
+              <button
+                className="w-full text-left px-4 py-2 text-sm text-blue-600 hover:bg-gray-100"
+                onClick={() => {
+                  router.push("/login");
+                }}
+              >
+                Sign in
+              </button>
+            )}
           </div>
         )}
       </div>
