@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useRef, useEffect } from 'react';
 import mapboxgl from 'mapbox-gl';
@@ -11,13 +11,14 @@ const HomePage = () => {
   const mapContainerRef = useRef(null);
 
   useEffect(() => {
-    mapboxgl.accessToken = "pk.eyJ1IjoiZmxvd2lydHoiLCJhIjoiY2tlcGhtMnFnMWRzajJ2bzhmdGs5ZXVveSJ9.Dq5iSpi54SaajfdMyM_8fQ";
-    
+    mapboxgl.accessToken =
+      'pk.eyJ1IjoiZmxvd2lydHoiLCJhIjoiY2tlcGhtMnFnMWRzajJ2bzhmdGs5ZXVveSJ9.Dq5iSpi54SaajfdMyM_8fQ';
+
     if (mapContainerRef.current) {
       mapRef.current = new mapboxgl.Map({
         container: mapContainerRef.current,
-        style: "mapbox://styles/mapbox/dark-v11",
-        center: [-2.5, 54.5], 
+        style: 'mapbox://styles/mapbox/dark-v11',
+        center: [-2.5, 54.5],
         zoom: 6,
       });
     }

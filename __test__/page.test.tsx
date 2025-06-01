@@ -52,7 +52,7 @@ describe('HomePage', () => {
 
   it('initializes mapbox with correct settings', () => {
     render(<HomePage />);
-    
+
     // Check if mapbox-gl was initialized
     expect(require('mapbox-gl').Map).toHaveBeenCalledWith({
       container: expect.anything(),

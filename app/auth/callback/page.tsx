@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
-import { useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useAuth } from "@/hooks/useAuth";
+import { useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function CallbackPage() {
   const { isAuthenticated, isLoading } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
-  
+
   useEffect(() => {
     // If authentication process is finished (no longer loading)
     if (!isLoading) {
@@ -22,7 +22,7 @@ export default function CallbackPage() {
       }
     }
   }, [isAuthenticated, isLoading, router, searchParams]);
-  
+
   // Show loading state while we wait for Auth0
   return (
     <div className="flex flex-col items-center justify-center min-h-screen">

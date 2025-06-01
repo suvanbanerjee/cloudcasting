@@ -1,15 +1,15 @@
-"use client";
+'use client';
 
-import { useSession, signIn, signOut } from "next-auth/react";
+import { useSession, signIn, signOut } from 'next-auth/react';
 
 export const useAuth = () => {
   const { data: session, status } = useSession();
-  const isLoading = status === "loading";
-  const isAuthenticated = status === "authenticated";
+  const isLoading = status === 'loading';
+  const isAuthenticated = status === 'authenticated';
 
   const handleSignOut = async () => {
-    localStorage.removeItem("auth-state");
-    sessionStorage.removeItem("auth-state");
+    localStorage.removeItem('auth-state');
+    sessionStorage.removeItem('auth-state');
     await signOut({ redirect: false });
   };
 
@@ -19,9 +19,9 @@ export const useAuth = () => {
     isAuthenticated,
     user: session?.user,
     signIn: () =>
-      signIn("auth0", {
+      signIn('auth0', {
         authorizationParams: {
-          prompt: "select_account",
+          prompt: 'select_account',
         },
       }),
     signOut: handleSignOut,

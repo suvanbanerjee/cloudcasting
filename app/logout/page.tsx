@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { useAuth } from "../../hooks/useAuth";
-import { Loader2 } from "lucide-react";
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '../../hooks/useAuth';
+import { Loader2 } from 'lucide-react';
 
 const Logout = () => {
   const { signOut, isAuthenticated, isLoading } = useAuth();
@@ -13,13 +13,13 @@ const Logout = () => {
   const handleLogout = () => {
     // Set logout completed state first so the UI updates
     setLogoutCompleted(true);
-    
+
     // Call the enhanced signOut function that will:
     // 1. Clear all client-side storage
     // 2. Sign out from NextAuth
     // 3. Redirect to Auth0 logout endpoint
     signOut();
-    
+
     // No need for setTimeout as the redirect is handled in the signOut function
   };
 
@@ -27,7 +27,7 @@ const Logout = () => {
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
       const redirectTimer = setTimeout(() => {
-        router.push("/");
+        router.push('/');
       }, 1000);
 
       return () => clearTimeout(redirectTimer);
@@ -41,16 +41,12 @@ const Logout = () => {
           <>
             <h1 className="text-2xl font-bold mb-4">Logging out...</h1>
             <Loader2 className="mx-auto w-8 h-8 text-yellow-400 animate-spin mb-4" />
-            <p className="text-gray-600">
-              Please wait while your session is being cleared.
-            </p>
+            <p className="text-gray-600">Please wait while your session is being cleared.</p>
           </>
         ) : isAuthenticated ? (
           <>
             <h1 className="text-2xl font-bold mb-4">Sign Out</h1>
-            <p className="text-gray-600 mb-4">
-              Are you sure you want to sign out?
-            </p>
+            <p className="text-gray-600 mb-4">Are you sure you want to sign out?</p>
             <button
               onClick={handleLogout}
               className="bg-yellow-400 hover:bg-yellow-500 text-black font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"

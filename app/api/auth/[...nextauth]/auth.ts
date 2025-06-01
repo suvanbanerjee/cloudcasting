@@ -1,6 +1,6 @@
 // Auth0 configuration for Next.js
-import { AuthOptions } from "next-auth";
-import Auth0Provider from "next-auth/providers/auth0";
+import { AuthOptions } from 'next-auth';
+import Auth0Provider from 'next-auth/providers/auth0';
 
 export const authOptions: AuthOptions = {
   providers: [
@@ -10,7 +10,7 @@ export const authOptions: AuthOptions = {
       issuer: process.env.AUTH0_ISSUER_BASE_URL!,
       authorization: {
         params: {
-          prompt: "login",
+          prompt: 'login',
         },
       },
     }),
@@ -18,7 +18,7 @@ export const authOptions: AuthOptions = {
   secret: process.env.AUTH0_SECRET,
   // Configure session management
   session: {
-    strategy: "jwt",
+    strategy: 'jwt',
     maxAge: 24 * 60 * 60, // 24 hours
   },
   // Configure secure cookies
@@ -27,9 +27,9 @@ export const authOptions: AuthOptions = {
       name: `next-auth.session-token`,
       options: {
         httpOnly: true,
-        sameSite: "lax",
-        path: "/",
-        secure: process.env.NODE_ENV === "production",
+        sameSite: 'lax',
+        path: '/',
+        secure: process.env.NODE_ENV === 'production',
       },
     },
   },
@@ -54,7 +54,7 @@ export const authOptions: AuthOptions = {
         return baseUrl;
       }
       // Allows relative callback URLs
-      if (url.startsWith("/")) return `${baseUrl}${url}`;
+      if (url.startsWith('/')) return `${baseUrl}${url}`;
       // Allows callback URLs on the same origin
       else if (new URL(url).origin === baseUrl) return url;
       return baseUrl;

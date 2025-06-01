@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { useAuth } from "../hooks/useAuth";
-import { withAuth } from "../utils/withAuth";
+import { useAuth } from '../hooks/useAuth';
+import { withAuth } from '../utils/withAuth';
 
 const ProfileComponent = () => {
   const { user, signOut } = useAuth();
@@ -14,7 +14,7 @@ const ProfileComponent = () => {
             {user?.image && (
               <img
                 src={user.image}
-                alt={user.name || "Profile"}
+                alt={user.name || 'Profile'}
                 className="h-12 w-12 rounded-full"
               />
             )}

@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { useAuth } from "../../hooks/useAuth";
-import { useEffect, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useAuth } from '../../hooks/useAuth';
+import { useEffect, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 const Login = () => {
   const { signIn, isAuthenticated, isLoading } = useAuth();
@@ -13,8 +13,7 @@ const Login = () => {
   useEffect(() => {
     if (!isLoading) {
       if (isAuthenticated) {
-        router.push("/");
-
+        router.push('/');
       } else if (!authInitiated) {
         setAuthInitiated(true);
         const returnTo = searchParams.get('returnTo') || '/';
