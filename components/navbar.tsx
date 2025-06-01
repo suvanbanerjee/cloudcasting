@@ -4,6 +4,7 @@ import { useState } from "react";
 import { User } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../hooks/useAuth";
+import Image from "next/image";
 
 const Header = () => {
   const router = useRouter();
@@ -25,10 +26,12 @@ const Header = () => {
           aria-label="User menu"
         >
           {user?.image ? (
-            <img 
+            <Image 
               src={user.image} 
               alt={user.name || "User"} 
               className="w-8 h-8 rounded-full"
+              width={32}
+              height={32}
             />
           ) : (
             <User size={20} />
