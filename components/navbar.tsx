@@ -5,7 +5,6 @@ import { User } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../hooks/useAuth';
 import Image from 'next/image';
-import Link from 'next/link';
 
 const Header = () => {
   const router = useRouter();
@@ -28,7 +27,6 @@ const Header = () => {
             d="m37.947 46.703 21.74-21.85-21.74-21.85M24.361 3 2.622 24.85l21.74 21.85M94.9 3 73.161 24.85l21.74 21.85M131.059 3 109.32 24.85l21.739 21.85M129.174 26.845l12.755-12.755"
           ></path>
         </svg>
-        {/* <Link href="/">CloudCasting</Link> */}
       </div>
 
       <div className="relative">

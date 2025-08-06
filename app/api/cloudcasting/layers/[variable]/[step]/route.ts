@@ -5,8 +5,9 @@ const API_BASE_URL =
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { variable: string; step: string } }
+  props: { params: Promise<{ variable: string; step: string }> }
 ) {
+  const params = await props.params;
   try {
     const { variable, step } = params;
 

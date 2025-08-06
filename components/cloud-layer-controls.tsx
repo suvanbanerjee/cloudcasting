@@ -17,7 +17,6 @@ export default function CloudLayerControls({ map }: CloudLayerControlsProps) {
   const [selectedVariable, setSelectedVariable] = useState('IR_016');
   const [timeStep, setTimeStep] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
-  const [currentLayer, setCurrentLayer] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [playSpeed, setPlaySpeed] = useState(1000); // milliseconds between frames
@@ -92,93 +91,94 @@ export default function CloudLayerControls({ map }: CloudLayerControlsProps) {
     };
   };
 
-  const fetchAndDisplayLayer = async (variable: string, step: number) => {
-    if (!map) return;
+  const fetchAndDisplayLayer = useCallback(
+    async (variable: string, step: number) => {
+      if (!map) return;
 
-    const layerId = createLayerId(variable, step);
-    const cacheKey = `${variable}-${step}`;
+      const layerId = createLayerId(variable, step);
+      const cacheKey = `${variable}-${step}`;
 
-    try {
-      // Hide all other layers for this variable first (instant switch)
-      for (let i = 0; i < maxTimeSteps; i++) {
-        const otherLayerId = createLayerId(variable, i);
-        if (map.getLayer(otherLayerId) && otherLayerId !== layerId) {
-          map.setLayoutProperty(otherLayerId, 'visibility', 'none');
+      try {
+        // Hide all other layers for this variable first (instant switch)
+        for (let i = 0; i < maxTimeSteps; i++) {
+          const otherLayerId = createLayerId(variable, i);
+          if (map.getLayer(otherLayerId) && otherLayerId !== layerId) {
+            map.setLayoutProperty(otherLayerId, 'visibility', 'none');
+          }
         }
-      }
 
-      // If layer already exists, just show it
-      if (map.getLayer(layerId)) {
-        map.setLayoutProperty(layerId, 'visibility', 'visible');
-        setCurrentLayer(layerId);
-        return;
-      }
+        // If layer already exists, just show it
+        if (map.getLayer(layerId)) {
+          map.setLayoutProperty(layerId, 'visibility', 'visible');
+          return;
+        }
 
-      let dataUrl: string;
-      let coordinates: [[number, number], [number, number], [number, number], [number, number]];
+        let dataUrl: string;
+        let coordinates: [[number, number], [number, number], [number, number], [number, number]];
 
-      // Check if we have this layer cached
-      if (cache.has(cacheKey)) {
-        const cachedData = JSON.parse(cache.get(cacheKey)!);
-        dataUrl = cachedData.dataUrl;
-        coordinates = cachedData.coordinates;
-        console.log(`Using cached layer: ${cacheKey}`);
-      } else {
-        setIsLoading(true);
-        setError(null);
+        // Check if we have this layer cached
+        if (cache.has(cacheKey)) {
+          const cachedData = JSON.parse(cache.get(cacheKey)!);
+          dataUrl = cachedData.dataUrl;
+          coordinates = cachedData.coordinates;
+          console.log(`Using cached layer: ${cacheKey}`);
+        } else {
+          setIsLoading(true);
+          setError(null);
 
-        // Fetch and process the TIF file
-        const result = await processGeoTiff(variable, step);
-        dataUrl = result.dataUrl;
-        coordinates = result.coordinates;
+          // Fetch and process the TIF file
+          const result = await processGeoTiff(variable, step);
+          dataUrl = result.dataUrl;
+          coordinates = result.coordinates;
 
-        // Cache the processed data
-        const cacheData = JSON.stringify({ dataUrl, coordinates });
-        setCache(prev => new Map(prev.set(cacheKey, cacheData)));
-        console.log(`Cached new layer: ${cacheKey}`);
+          // Cache the processed data
+          const cacheData = JSON.stringify({ dataUrl, coordinates });
+          setCache(prev => new Map(prev.set(cacheKey, cacheData)));
+          console.log(`Cached new layer: ${cacheKey}`);
+          setIsLoading(false);
+        }
+
+        // Add the new layer
+        map.addSource(layerId, {
+          type: 'image',
+          url: dataUrl,
+          coordinates,
+        });
+
+        map.addLayer({
+          id: layerId,
+          type: 'raster',
+          source: layerId,
+          layout: {
+            visibility: 'visible',
+          },
+          paint: {
+            'raster-opacity': 0.7,
+            'raster-fade-duration': 0, // Instant transitions
+          },
+        });
+
+        setLoadedLayers(prev => new Set(prev).add(layerId));
+      } catch (error) {
+        console.error('Error fetching cloud layer:', error);
+        let errorMessage = 'Failed to load cloud layer';
+
+        if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
+          errorMessage =
+            'CORS error: Unable to fetch data. Check if the API server allows cross-origin requests.';
+        } else if (error instanceof Error) {
+          errorMessage = error.message;
+        }
+
+        setError(errorMessage);
         setIsLoading(false);
       }
-
-      // Add the new layer
-      map.addSource(layerId, {
-        type: 'image',
-        url: dataUrl,
-        coordinates,
-      });
-
-      map.addLayer({
-        id: layerId,
-        type: 'raster',
-        source: layerId,
-        layout: {
-          visibility: 'visible',
-        },
-        paint: {
-          'raster-opacity': 0.7,
-          'raster-fade-duration': 0, // Instant transitions
-        },
-      });
-
-      setLoadedLayers(prev => new Set(prev).add(layerId));
-      setCurrentLayer(layerId);
-    } catch (error) {
-      console.error('Error fetching cloud layer:', error);
-      let errorMessage = 'Failed to load cloud layer';
-
-      if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
-        errorMessage =
-          'CORS error: Unable to fetch data. Check if the API server allows cross-origin requests.';
-      } else if (error instanceof Error) {
-        errorMessage = error.message;
-      }
-
-      setError(errorMessage);
-      setIsLoading(false);
-    }
-  };
+    },
+    [map, maxTimeSteps, cache]
+  );
 
   // Preload all time steps for current variable
-  const preloadTimeSteps = async () => {
+  const preloadTimeSteps = useCallback(async () => {
     if (!map) return Promise.resolve();
 
     setIsLoading(true);
@@ -248,12 +248,11 @@ export default function CloudLayerControls({ map }: CloudLayerControlsProps) {
     const currentLayerId = createLayerId(selectedVariable, timeStep);
     if (map.getLayer(currentLayerId)) {
       map.setLayoutProperty(currentLayerId, 'visibility', 'visible');
-      setCurrentLayer(currentLayerId);
     }
 
     setIsLoading(false);
     return Promise.resolve();
-  };
+  }, [map, maxTimeSteps, selectedVariable, timeStep, cache]);
 
   // Play animation controls
   const startAnimation = useCallback(() => {
@@ -326,7 +325,7 @@ export default function CloudLayerControls({ map }: CloudLayerControlsProps) {
     if (map && map.isStyleLoaded()) {
       fetchAndDisplayLayer(selectedVariable, timeStep);
     }
-  }, [selectedVariable, timeStep, map]);
+  }, [selectedVariable, timeStep, map, fetchAndDisplayLayer]);
 
   // Stop animation when variable changes
   useEffect(() => {
@@ -361,7 +360,7 @@ export default function CloudLayerControls({ map }: CloudLayerControlsProps) {
         return newSet;
       });
     }
-  }, [selectedVariable, map]);
+  }, [selectedVariable, map, loadedLayers]);
 
   // Cleanup effect when component unmounts
   useEffect(() => {
@@ -383,7 +382,7 @@ export default function CloudLayerControls({ map }: CloudLayerControlsProps) {
         });
       }
     };
-  }, [map, stopAnimation]);
+  }, [map, stopAnimation, loadedLayers]);
 
   // Keyboard controls for play/pause and navigation
   useEffect(() => {
@@ -418,12 +417,25 @@ export default function CloudLayerControls({ map }: CloudLayerControlsProps) {
     };
   }, [map, isLoading, togglePlayPause, maxTimeSteps]);
 
-  const cachedSteps = Array.from(cache.keys()).filter(key =>
-    key.startsWith(selectedVariable)
-  ).length;
-
   return (
     <>
+      {/* Error Display */}
+      {error && (
+        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-30">
+          <div className="bg-red-500/90 backdrop-blur-sm text-white px-4 py-2 rounded-lg shadow-lg flex items-center gap-2">
+            <span className="text-sm">⚠️</span>
+            <span className="text-sm">{error}</span>
+            <button
+              onClick={() => setError(null)}
+              className="ml-2 text-white hover:text-red-200"
+              aria-label="Dismiss error"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Dock-style Timeline Bar */}
       <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-20">
         <div className="bg-black/70 backdrop-blur-sm rounded-xl shadow-lg px-3 py-2 flex items-center gap-3">
@@ -501,11 +513,11 @@ export default function CloudLayerControls({ map }: CloudLayerControlsProps) {
                 {isPlaying ? 'Pause (Space)' : 'Play (Space)'}
               </span>
             </button>
-            {/* {isLoading && (
+            {isLoading && preloadProgress > 0 && (
               <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 text-xs bg-black/75 text-white rounded whitespace-nowrap">
                 Preloading layers... {Math.round(preloadProgress)}%
               </div>
-            )} */}
+            )}
           </div>
 
           {/* Speed Control */}
