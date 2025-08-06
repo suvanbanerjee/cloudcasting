@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 const API_BASE_URL =
-  process.env.CLOUDCASTING_API_URL || 'http://localhost:8000/api/cloudcasting/layers';
+  process.env.CLOUDCASTING_API_URL ||
+  'http://https://gsoc-cloudcasting-api.onrender.com/api/cloudcasting/layers';
 
 export async function GET(
   request: NextRequest,
