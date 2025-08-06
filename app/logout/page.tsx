@@ -11,19 +11,11 @@ const Logout = () => {
   const [logoutCompleted, setLogoutCompleted] = useState(false);
 
   const handleLogout = () => {
-    // Set logout completed state first so the UI updates
     setLogoutCompleted(true);
-
-    // Call the enhanced signOut function that will:
-    // 1. Clear all client-side storage
-    // 2. Sign out from NextAuth
-    // 3. Redirect to Auth0 logout endpoint
     signOut();
-
-    // No need for setTimeout as the redirect is handled in the signOut function
   };
 
-  // If already logged out (no authenticated session), redirect to home
+  // Check if user is not authenticated
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
       const redirectTimer = setTimeout(() => {

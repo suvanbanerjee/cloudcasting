@@ -2,12 +2,11 @@
 
 import { useAuth } from '../../hooks/useAuth';
 import { useEffect, useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
 const Login = () => {
   const { signIn, isAuthenticated, isLoading } = useAuth();
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [authInitiated, setAuthInitiated] = useState(false);
 
   useEffect(() => {
@@ -16,7 +15,6 @@ const Login = () => {
         router.push('/');
       } else if (!authInitiated) {
         setAuthInitiated(true);
-        const returnTo = searchParams.get('returnTo') || '/';
         signIn();
       }
     }
