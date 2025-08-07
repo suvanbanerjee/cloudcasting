@@ -16,6 +16,13 @@ const HomePage = () => {
     mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN || '';
 
     if (mapContainerRef.current) {
+      const bounds = new mapboxgl.LngLatBounds(
+        [-17, 44], // Southwest coordinates (UK southwest corner)
+        [11, 73] // Northeast coordinates (UK northeast corner)
+      );
+
+      console.log('Initializing Mapbox GL JS with bounds:', bounds);
+
       mapRef.current = new mapboxgl.Map({
         container: mapContainerRef.current,
         style: 'mapbox://styles/mapbox/dark-v11',
